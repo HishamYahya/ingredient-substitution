@@ -1,17 +1,18 @@
-from ingredient_substitution_models import DIISHModel
-from recipe_similarity_models import TFIDFSimilarity
-from helper_functions import tokenize
+from ingredient_substitution_models import DIISHModel, IngredientSubstitution
+from recipe_similarity_models import TFIDFSimilarity, RecipeSimilarity
+from helper_functions import tokenize, TextCleaner
 from gensim.corpora import Dictionary
 
 class Substitution:
 	def __init__(
 			self,
 			directory,
-			ingredient_substitution_model=DIISHModel,
-			recipe_similarity_model=TFIDFSimilarity
+			ingredient_substitution_model: IngredientSubstitution = DIISHModel,
+			recipe_similarity_model: RecipeSimilarity = TFIDFSimilarity
 	):
 		self.is_model = ingredient_substitution_model(directory)
 		self.rs_model = recipe_similarity_model(directory)
+		self.cleaner = TextCleaner(directory)
 		self.directory = directory
 
 
@@ -25,6 +26,9 @@ class Substitution:
 	sorted by confidence
 	"""
 	def get_substitutions(self, recipe, verbose=False):
+		# filter every ingredient and join them into one string
+		recipe = " ".join([self.cleaner.filter_ingredient(ing) for ing in recipe])
+
 		# get the most similar recipes
 		similar_recipes = self.rs_model.get_most_similar(recipe)
 		if verbose:
@@ -90,5 +94,24 @@ class Substitution:
 		important_ings = list(filter(lambda x: x not in subs_ings, all_ings))
 		return important_ings, subs_ings
 
-sub = Substitution('/Users/hisham/Google Drive/Recipes1M')
-print(sub.get_substitutions('cheese cheddar gruyere cheese chilli butter flour milk cheese cheese salt chilli garlic', verbose=True))
+directory = '/Users/hisham/Google Drive/Recipes1M'
+sub = Substitution(directory)
+
+recipe = [
+	'6 ounces penne',
+	'2 cups Beechers Flagship Cheese Sauce (recipe follows)',
+	'1 ounce Cheddar, grated (1/4 cup)',
+	'1 ounce Gruyere cheese, grated (1/4 cup)',
+	'1/4 to 1/2 teaspoon chipotle chili powder (see Note)',
+	'1/4 cup (1/2 stick) unsalted butter',
+	'1/3 cup all-purpose flour',
+	'3 cups milk',
+	'14 ounces semihard cheese (page 23), grated (about 3 1/2 cups)',
+	'2 ounces semisoft cheese (page 23), grated (1/2 cup)',
+	'1/2 teaspoon kosher salt',
+	'1/4 to 1/2 teaspoon chipotle chili powder',
+	'1/8 teaspoon garlic powder',
+	'(makes about 4 cups)'
+ ]
+
+print(sub.get_substitutions(recipe, verbose=True))

@@ -1,7 +1,9 @@
 from helper_functions import split_array_ranges, tokenize
 from sklearn.neighbors import NearestNeighbors
 
-
+"""
+	Interface for recipe similarity implementations
+"""
 class RecipeSimilarity:
 	def __init__(self, directory):
 		self.directory = directory

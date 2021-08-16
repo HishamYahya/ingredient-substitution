@@ -1,3 +1,5 @@
+from .text_cleaning import TextCleaner
+
 """
 Takes in a length of a list and returns a list of index tuples covering k chunks
 """
