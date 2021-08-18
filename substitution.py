@@ -63,7 +63,7 @@ class Substitution:
 		# recipes = [data[index].split() for index, _ in similar_recipes]
 
 		if verbose:
-			print(recipes)
+			print('Recipe ingredients: ', recipes)
 		# get the important and substitutable ingredients
 		imp, subs = self.get_substitutable_ings(recipes)
 
