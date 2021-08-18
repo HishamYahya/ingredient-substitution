@@ -44,7 +44,7 @@ class Substitution:
 	def get_substitutions(self, recipe, verbose=False):
 		# filter every ingredient and join them into one string then split
 		# in case more than one ingredient is in a list element
-		recipe = " ".join([self.cleaner.filter_ingredient(ing) for ing in recipe])
+		recipe = self.cleaner.filter_ingredient(" ".join(recipe))
 
 		# get the most similar recipes
 		similar_recipes = self.rs_model.get_most_similar(recipe)
