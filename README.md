@@ -1,0 +1,13 @@
+# Unsupervised Ingredient Substitution Model
+To get started, create an instance of the Substitution class passing it the path of the directory containing the needed files. It takes around 15 minutes for it to initialize. You can then pass a list of ingredient strings to ```get_substitutions()```
+to get suggestions in the form of:
+```
+{
+  'from': ...
+  'to': ...
+  'confidence': ...
+  ghg_difference: ...
+}
+```
+
+Take a look at demo.py for a simple example application of the model.
