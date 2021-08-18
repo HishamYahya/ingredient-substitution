@@ -2,6 +2,10 @@ from ingredient_substitution_models import DIISHModel, IngredientSubstitution
 from recipe_similarity_models import TFIDFSimilarity, RecipeSimilarity
 from helper_functions import tokenize, TextCleaner
 from gensim.corpora import Dictionary
+from collections import defaultdict
+import numpy as np
+import pandas as pd
+
 
 class Substitution:
 	def __init__(
@@ -15,6 +19,18 @@ class Substitution:
 		self.cleaner = TextCleaner(directory)
 		self.directory = directory
 
+		self.generate_ghg_dict()
+
+
+	def generate_ghg_dict(self):
+		df = pd.read_excel(f'{self.directory}/Master data - ECare - v12.xlsx', sheet_name='Master DB')
+		ghg = np.array(df.iloc[:,[0, 1, 8]][df['Food'].notna()])
+		ghg = [(self.cleaner.normalise_ingredient(x), self.cleaner.normalise_ingredient(y), z) for x, y, z in ghg]
+		self.ghg = defaultdict(int)
+		for ing, syn, val in ghg:
+			self.ghg[ing] = val
+		if syn == syn:
+			self.ghg[syn] = val
 
 	"""
 	Parameters:
@@ -26,7 +42,8 @@ class Substitution:
 	sorted by confidence
 	"""
 	def get_substitutions(self, recipe, verbose=False):
-		# filter every ingredient and join them into one string
+		# filter every ingredient and join them into one string then split
+		# in case more than one ingredient is in a list element
 		recipe = " ".join([self.cleaner.filter_ingredient(ing) for ing in recipe])
 
 		# get the most similar recipes
@@ -55,22 +72,40 @@ class Substitution:
 			print("Substitutable: ", subs)  
 
 		substitutions = []
-		# loop through every ingredients in the passed recipe
-		for ingredient in recipe:
+		# loop through every ingredient in the passed recipe
+		for ingredient in recipe.split():
 			# if it's substitutable in the recipe,
 			if ingredient in subs:
-				# check if the FastText model outputs something that
+				# check if the ingredient substitution model outputs something that
 				# is also substitutable in the recipe
 				similar_ingredients = self.is_model.get_top_candidates(ingredient, k=5)
 				for sim_ing, confidence in similar_ingredients:
 					# add it to the list of possible substitutions if it is
 					if sim_ing in subs and sim_ing not in recipe:
-						substitutions.append((ingredient, sim_ing, confidence))
+						substitutions.append({'from': ingredient, 'to': sim_ing, 'confidence': confidence})
 
 		# remove duplicates
-		substitutions = list(set(substitutions))
+		substitutions = [dict(t) for t in {tuple(s.items()) for s in substitutions}]
 		# sort by how confident we are of the substitution being a viable one
-		substitutions.sort(key=lambda x: x[2], reverse=True)
+		substitutions.sort(key=lambda x: x['confidence'], reverse=True)
+
+		total_ghg = sum([self.ghg[ing] for ing in recipe])
+
+		# only return substitutions of ingredients that make up >=20%
+		# of the total recipe's ghg and if the subtitute has a less ghg
+		substitutions = list(filter(
+			lambda sub: self.ghg[sub['from']] > self.ghg[sub['to']] and
+			self.ghg[sub['from']] >= 0.2 * total_ghg,
+			substitutions
+			)
+		)
+
+		# add ghg difference to substitutions
+		for sub in substitutions:
+			sub['ghg_difference'] = self.ghg[sub['from']] - self.ghg[sub['to']]
+
+		# change to dictionary
+
 
 		return substitutions
 
@@ -93,25 +128,3 @@ class Substitution:
 		subs_ings = list(id2word.values())
 		important_ings = list(filter(lambda x: x not in subs_ings, all_ings))
 		return important_ings, subs_ings
-
-directory = '/Users/hisham/Google Drive/Recipes1M'
-sub = Substitution(directory)
-
-recipe = [
-	'6 ounces penne',
-	'2 cups Beechers Flagship Cheese Sauce (recipe follows)',
-	'1 ounce Cheddar, grated (1/4 cup)',
-	'1 ounce Gruyere cheese, grated (1/4 cup)',
-	'1/4 to 1/2 teaspoon chipotle chili powder (see Note)',
-	'1/4 cup (1/2 stick) unsalted butter',
-	'1/3 cup all-purpose flour',
-	'3 cups milk',
-	'14 ounces semihard cheese (page 23), grated (about 3 1/2 cups)',
-	'2 ounces semisoft cheese (page 23), grated (1/2 cup)',
-	'1/2 teaspoon kosher salt',
-	'1/4 to 1/2 teaspoon chipotle chili powder',
-	'1/8 teaspoon garlic powder',
-	'(makes about 4 cups)'
- ]
-
-print(sub.get_substitutions(recipe, verbose=True))

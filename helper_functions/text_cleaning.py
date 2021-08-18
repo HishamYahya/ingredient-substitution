@@ -17,6 +17,17 @@ class TextCleaner:
 
 		self.lemmatizer = WordNetLemmatizer()
 
+	def normalise_ingredient(self, name):
+		if type(name) is not str:
+			return name
+		name = name.lower()
+		name = name.replace('-', ' ')
+		# remove parenthesised items
+		name = re.sub(r'\(.*\)', "", name)
+		name = [self.lemmatizer.lemmatize(word) for word in name.split()]
+
+		return "_".join(name)
+
 	def get_name(self, ing):
 		if ing in self.food_names:
 			return ing

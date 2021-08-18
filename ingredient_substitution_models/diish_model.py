@@ -11,5 +11,5 @@ class DIISHModel(IngredientSubstitution):
 
 	def get_top_candidates(self, ingredient, k):
 		scores = self.matrix[self.dictionary.token2id[ingredient]]
-		scores = [(self.dictionary[i], score) for i, score in enumerate(scores) if score == score]
+		scores = [(self.dictionary[i], score/4.5) for i, score in enumerate(scores) if score == score]
 		return sorted(scores, key=lambda x: x[1], reverse=True)[1:k+1]
