@@ -2,6 +2,8 @@ import json
 import string
 import regex as re
 from nltk.stem import WordNetLemmatizer
+import nltk
+nltk.download('wordnet')
 
 class TextCleaner:
 	def __init__(self, directory):
