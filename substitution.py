@@ -22,10 +22,10 @@ class Substitution:
 		self.directory = directory
 
 
-	"""
-	Loads dictionary with ghg values from the KB
-	"""
 	def generate_ghg_dict(self):
+		"""
+		Loads dictionary with ghg values from the KB
+		"""
 		print('Loading ghg dictionary...')
 		self.ghg = defaultdict(float)
 		ids = requests.get('https://ecarekb.schlegel-online.de/foodon_ids').json()
@@ -44,16 +44,24 @@ class Substitution:
 		print('ghg dictionary loaded!')
 
 
-	"""
-	Parameters:
-	recipe: a list of ingredient strings, formatting doesn't matter
-
-	Returns:
-	a list of tuples in the format of
-	(original_ingredient, substitution, confidence)
-	sorted by confidence
-	"""
 	def get_substitutions(self, recipe, verbose=False):
+		"""
+		Parameters:
+		recipe: a list of ingredient strings, formatting doesn't matter
+
+		Returns:
+		a list of dictionaries in the format of
+
+		{
+			'from': ...
+			'to': ...
+			'confidence': ...
+			'ghg_difference': ...
+			'percent_decrease': ...
+		}
+		
+		sorted by confidence
+		"""
 		# filter every ingredient and join them into one string then split
 		# in case more than one ingredient is in a list element
 		recipe = self.cleaner.filter_ingredient(" ".join(recipe))
@@ -117,23 +125,19 @@ class Substitution:
 			sub['ghg_difference'] = self.ghg[sub['from']] - self.ghg[sub['to']]
 			sub['percent_decrease'] = sub['ghg_difference'] / total_ghg
 
-		# change to dictionary
-
-
 		return substitutions
 
-	"""
-	Seperates the important ingredients from the substituable one
-
-	Parameters:
-	recipes: list of *tokenized* recipes
-	no_above: the minimum fraction to be considered important
-
-	Returns
-	important_ings
-	subs_ings
-	"""
 	def get_substitutable_ings(self, recipes, no_above = 0.6):
+		"""
+		Seperates the important ingredients from the substituable one
+
+		Parameters:
+		recipes: list of *tokenized* recipes
+		no_above: the minimum fraction to be considered important
+
+		Returns
+		(important_ings, subs_ings)
+		"""
 		id2word = Dictionary(recipes)
 		all_ings = list(id2word.values())
 		id2word.filter_extremes(no_below=0, no_above=no_above)

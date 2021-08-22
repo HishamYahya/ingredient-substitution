@@ -1,9 +1,9 @@
 from .text_cleaning import TextCleaner
 
-"""
-Takes in a length of a list and returns a list of index tuples covering k chunks
-"""
 def split_array_ranges(length, k):
+	"""
+	Takes in a length of a list and returns a list of index tuples covering k chunks
+	"""
 	chunks = []
 	step = int(length/k)
 	start_ind = 0
