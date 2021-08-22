@@ -112,9 +112,10 @@ class Substitution:
 			)
 		)
 
-		# add ghg difference to substitutions
+		# add ghg difference and percent decrease to substitutions
 		for sub in substitutions:
 			sub['ghg_difference'] = self.ghg[sub['from']] - self.ghg[sub['to']]
+			sub['percent_decrease'] = sub['ghg_difference'] / total_ghg
 
 		# change to dictionary
 
