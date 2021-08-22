@@ -5,6 +5,7 @@ from gensim.corpora import Dictionary
 from collections import defaultdict
 import numpy as np
 import pandas as pd
+import requests
 
 
 class Substitution:
@@ -14,23 +15,34 @@ class Substitution:
 			ingredient_substitution_model: IngredientSubstitution = DIISHModel,
 			recipe_similarity_model: RecipeSimilarity = TFIDFSimilarity
 	):
+		self.cleaner = TextCleaner(directory)
+		self.generate_ghg_dict()
 		self.is_model = ingredient_substitution_model(directory)
 		self.rs_model = recipe_similarity_model(directory)
-		self.cleaner = TextCleaner(directory)
 		self.directory = directory
 
-		self.generate_ghg_dict()
 
-
+	"""
+	Loads dictionary with ghg values from the KB
+	"""
 	def generate_ghg_dict(self):
-		df = pd.read_excel(f'{self.directory}/Master data - ECare - v12.xlsx', sheet_name='Master DB')
-		ghg = np.array(df.iloc[:,[0, 1, 8]][df['Food'].notna()])
-		ghg = [(self.cleaner.normalise_ingredient(x), self.cleaner.normalise_ingredient(y), z) for x, y, z in ghg]
-		self.ghg = defaultdict(int)
-		for ing, syn, val in ghg:
-			self.ghg[ing] = val
-		if syn == syn:
-			self.ghg[syn] = val
+		print('Loading ghg dictionary...')
+		self.ghg = defaultdict(float)
+		ids = requests.get('https://ecarekb.schlegel-online.de/foodon_ids').json()
+		for ing in ids:
+			name = self.cleaner.filter_ingredient(ing['ingredient'])
+			if name:
+				req = requests.get(f'https://ecarekb.schlegel-online.de/ingredient?ingredient={"+".join(ing["ingredient"].split())}')
+				ghg = req.json()['ghg']
+				self.ghg[name] = ghg
+			else:
+				continue
+			for alt_name in ing['alternate_names']:
+				alt_name_f = self.cleaner.filter_ingredient(alt_name)
+				if alt_name_f and alt_name_f not in self.ghg:
+					self.ghg[alt_name_f] = ghg
+		print('ghg dictionary loaded!')
+
 
 	"""
 	Parameters:
