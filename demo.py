@@ -20,7 +20,7 @@ def main():
 			print('Great!')	
 
 	while recipe != 'q':
-		subs = sub.get_substitutions(recipe.split(), verbose=True)
+		subs = sub.get_substitutions(recipe.split())
 		if not subs:
 			print('No valid substitutions found')
 		else:
