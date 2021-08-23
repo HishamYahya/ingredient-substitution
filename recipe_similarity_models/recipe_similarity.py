@@ -11,9 +11,9 @@ class RecipeSimilarity:
 		self.vectorizer = None
 	
 
-	def get_most_similar(self, recipe: str, k = 10, n_clusters = 10):
+	def get_most_similar(self, recipe: [str], k = 10, n_clusters = 10):
 		# get vector of recipe
-		docvec = next(self.vectorizer.transform(tokenize([recipe])))
+		docvec = next(self.vectorizer.transform([recipe]))
 
 		# cut data to n_clusters number of clusters
 		similar_recipes = []
