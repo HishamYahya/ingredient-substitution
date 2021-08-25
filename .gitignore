@@ -1,5 +1,9 @@
+.DS_Store
 # demo error file
 errors.txt
+
+# generated model path
+build
 
 # Byte-compiled / optimized / DLL files
 **/__pycache__
