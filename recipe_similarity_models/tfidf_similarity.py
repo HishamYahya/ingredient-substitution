@@ -12,7 +12,7 @@ class TFIDFSimilarity(RecipeSimilarity):
 			dict_path=f'{self.directory}/dictionary.txt'
 		)
 		print('Loading vectors... (this might take a while)')
-		self.vectors = np.loadtxt(f'{self.directory}/tfidf_vectors_ingredients_only.npy')
+		self.vectors = np.loadtxt(f'{self.directory}/tfidf_vectors_ingredients_only.gz')
 		print('Vectors loaded!')
 
 	

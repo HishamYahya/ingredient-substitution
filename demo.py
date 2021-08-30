@@ -2,7 +2,7 @@ from substitution import Substitution
 
 def main():
 	# change to directory of folder containing needed files
-	directory = 'build'
+	directory = '/Users/hisham/Google Drive/Recipes1M'
 	sub= Substitution(directory)
 
 	recipe = input('Enter recipe ingredients seperated by spaces (q to quit): ')

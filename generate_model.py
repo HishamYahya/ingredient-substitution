@@ -383,7 +383,7 @@ def generate_tfidf_recipe_similarity_model_and_vectors():
 	print('Generating vectors...')
 	vecs = list(model.transform(data))
 	print('Saving vectors...')
-	np.savetxt('build/tfidf_vectors_ingredients_only.npy', vecs)
+	np.savetxt('build/tfidf_vectors_ingredients_only.gz', vecs)
 	print('Done!')
 
 
