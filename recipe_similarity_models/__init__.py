@@ -1,2 +1,3 @@
 from .tfidf_similarity import TFIDFSimilarity
+from .knn_vectors_similarity import kNNVectorsSimilarity
 from .recipe_similarity import RecipeSimilarity
