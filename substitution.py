@@ -15,6 +15,9 @@ class Substitution:
         ingredient_substitution_model: IngredientSubstitution = DIISHModel,
         recipe_similarity_model: RecipeSimilarity = TFIDFSimilarity
     ):
+        print('Loading recipes...')
+        with open(f'{directory}/recipes_ingredients_only.txt') as f:
+            self.data = f.readlines()
         self.cleaner = TextCleaner(directory)
         self.generate_ghg_dict()
         self.is_model = ingredient_substitution_model(directory)
@@ -52,7 +55,7 @@ class Substitution:
                           verbose=False):
         """
         Parameters:
-                recipe: a list of ingredient strings, formatting doesn't matter
+                recipe: a list of ingredient strings (with instructions if the recipe similarity model allows for it), formatting doesn't matter
                 k_similar_recipes: how many recipes in the cluster
                 k_top_candidates: number of considered ingredient substitutions
                 important_threshold: the minimum fraction of the similar recipes an
@@ -77,24 +80,26 @@ class Substitution:
         recipe = self.cleaner.filter_ingredient(" ".join(recipe)).split()
 
         # get the most similar recipes
-        similar_recipes = self.rs_model.get_most_similar(
-            recipe, k=k_similar_recipes)
+        similar_recipes = self.rs_model.get_most_similar(recipe, k=k_similar_recipes)
         if verbose:
             print('Similar recipes (index, confidence):')
             print(similar_recipes)
 
         # load the recipes' ingredients and tokenize them
-        recipes_ind = [x[0] for x in similar_recipes]
-        recipes = []
-        with open(f'{self.directory}/recipes_ingredients_only.txt') as f:
-            for i, line in enumerate(f):
-                if i in recipes_ind:
+        # recipes_ind = [x[0] for x in similar_recipes]
+        # recipes = []
+        # with open(f'{self.directory}/recipes_ingredients_only.txt') as f:
+        #     for i, line in enumerate(f):
+        #         if i in recipes_ind:
+        #             # only consider recipes that aren't a superset of the input recipe
+        #             # because we care about what can be substituted rather than added
+        #             if not set(line.split()).issuperset(recipe):
+        #                 recipes.append(line.split())
+
+        recipes = [self.data[index].split() for index, _ in similar_recipes
                     # only consider recipes that aren't a superset of the input recipe
                     # because we care about what can be substituted rather than added
-                    if not set(line.split()).issuperset(recipe):
-                        recipes.append(line.split())
-
-        # recipes = [data[index].split() for index, _ in similar_recipes]
+                    if not set(self.data[index].split()).issuperset(recipe)]
 
         if verbose:
             print('Recipe ingredients: ', recipes)

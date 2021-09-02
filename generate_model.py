@@ -12,7 +12,7 @@ from gensim.test.utils import datapath
 from scipy.spatial import distance
 from itertools import combinations
 from helper_functions import TextCleaner, tokenize
-from vectorizers import TFIDFVectorizer
+from vectorizers import TFIDFVectorizer, Doc2VecVectorizer
 
 def main(argv):
 	if not os.path.exists('build'):
@@ -32,6 +32,7 @@ def main(argv):
 	generate_fic_vectors()
 	generate_DIISH_matrix()
 	generate_tfidf_recipe_similarity_model_and_vectors()
+	generate_doc2vec_recipe_similarity_model_and_vectors()
 	
 
 def generate_food_names_and_synonyms():
@@ -386,6 +387,26 @@ def generate_tfidf_recipe_similarity_model_and_vectors():
 	np.savetxt('build/tfidf_vectors_ingredients_only.gz', vecs)
 	print('Done!')
 
+def generate_doc2vec_recipe_similarity_model_and_vectors():
+	print('--- Doc2Vec Model and Vectors ---')
+
+	print('Fitting model...')
+	doc2vec = Doc2VecVectorizer().fit(corpus_file='build/recipes_ingredients_and_instructions.txt')
+
+	print('Saving model...')
+	doc2vec.model.save('build/doc2vec_ingredients_and_instructions.model')
+
+	print('Generating vectors...')
+	vecs = []
+	with open('build/recipes_ingredients_and_instructions.txt', 'r') as f:
+		for _, line in enumerate(f):
+			line = line.split()
+			vecs.append(doc2vec.model.infer_vector(line))
+
+	print('Saving vectors...')
+	np.savetxt('build/doc2vec_vectors_ingredients_and_instructions.gz', vecs)
+
+	print('Done!')
 
 if __name__ == '__main__':
 	main(sys.argv)

@@ -1,3 +1,4 @@
 from .tfidf_similarity import TFIDFSimilarity
+from .doc2vec_similarity import Doc2VecSimilarity
 from .knn_vectors_similarity import kNNVectorsSimilarity
 from .recipe_similarity import RecipeSimilarity
