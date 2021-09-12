@@ -4,6 +4,9 @@ import numpy as np
 from gensim.corpora import Dictionary
 
 class DIISHModel(IngredientSubstitution):
+	"""
+	Implements the DIISH ingredient substitution approach
+	"""
 	def __init__(self, directory):
 		super().__init__(directory)
 		self.matrix = np.loadtxt(f'{self.directory}/DIISH_matrix.npy')

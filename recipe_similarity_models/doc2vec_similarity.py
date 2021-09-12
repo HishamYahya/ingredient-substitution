@@ -12,6 +12,7 @@ class Doc2VecSimilarity(kNNVectorsSimilarity):
 		self.vectorizer = Doc2VecVectorizer(f'{self.directory}/doc2vec_ingredients_and_instructions.model')
 		print('Loading vectors... (this might take a while)')
 		self.vectors = np.loadtxt(f'{self.directory}/doc2vec_vectors_ingredients_and_instructions.gz')
+		# self.vectors = self.vectorizer.model.dv.vectors
 		print('Vectors loaded!')
 
 	

@@ -11,9 +11,9 @@ download('stopwords')
 class TextCleaner:
 	def __init__(self, directory=None):
 		"""
-			Parameters:
-				directory: path to food_names.json and synonyms.json (set to None if
-				you need to use without preloading)
+		Parameters:
+			directory: path to food_names.json and synonyms.json (set to None if
+			you need to use without preloading)
 		"""
 		if directory:
 			self.directory = directory

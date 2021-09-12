@@ -1,7 +1,7 @@
-"""
-	Interface for ingredient substitution implementations
-"""
 class IngredientSubstitution:
+	"""
+		Interface for ingredient substitution implementations
+	"""
 	def __init__(self, directory):
 		self.directory = directory
 
