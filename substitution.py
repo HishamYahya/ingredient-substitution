@@ -98,7 +98,7 @@ class Substitution:
 
         # filter ingredients and instructions and then tokenize them
         ingredients = [(self.cleaner.filter_ingredient(ing), hc) for ing, hc in ingredients]
-        instructions = self.cleaner.filter_ingredient(" || ".join(instructions)).split()
+        instructions = self.cleaner.filter_instruction(" || ".join(instructions)).split()
 
         # concatenate the two using @@ if there are instructions
         if instructions:
