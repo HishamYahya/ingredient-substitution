@@ -7,6 +7,9 @@ import numpy as np
 
 
 class kNNVectorsSimilarity(RecipeSimilarity):
+	"""
+	Interface for vector-based, kNN recipe similarity implementations
+	"""
 	def __init__(self, directory):
 		super().__init__(directory)
 		self.vectorizer = None
